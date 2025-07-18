@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "aws-lambda": "^1.0.7"
+  }
+}
