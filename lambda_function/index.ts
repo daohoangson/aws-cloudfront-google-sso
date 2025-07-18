@@ -1,17 +1,16 @@
-// @ts-check
-
+import type {
+  CloudFrontHeaders,
+  CloudFrontRequest,
+  CloudFrontRequestHandler,
+  CloudFrontResultResponse,
+} from "aws-lambda";
 import jsonwebtoken from "jsonwebtoken";
 
 const CALLBACK_PATH = "/callback";
 
-/** @type {Record<string, string>|undefined} */
-let globalPems = undefined;
+let globalPems: Record<string, string> | undefined = undefined;
 
-/**
- * @param {string} keyId
- * @returns {Promise<string|undefined>}
- */
-async function getPemByKeyId(keyId) {
+async function getPemByKeyId(keyId: string): Promise<string | undefined> {
   if (keyId.length === 0) return undefined;
   if (typeof globalPems !== "undefined") {
     return globalPems[keyId];
@@ -29,14 +28,8 @@ async function getPemByKeyId(keyId) {
   }
 }
 
-/**
- *
- * @param {import('aws-lambda').CloudFrontHeaders} headers
- * @returns {Record<string, string|undefined>}
- */
-function parseCookies(headers) {
-  /** @type {Record<string, string|undefined>} */
-  const parsedCookie = {};
+function parseCookies(headers: CloudFrontHeaders): Record<string, string> {
+  const parsedCookie: Record<string, string> = {};
   if (headers.cookie) {
     headers.cookie[0].value.split(";").forEach((cookie) => {
       if (cookie) {
@@ -48,11 +41,9 @@ function parseCookies(headers) {
   return parsedCookie;
 }
 
-/**
- * @param {import('aws-lambda').CloudFrontRequest} request
- * @returns {import('aws-lambda').CloudFrontResultResponse}
- */
-function showGoogleSignInButton(request) {
+function showGoogleSignInButton(
+  request: CloudFrontRequest
+): CloudFrontResultResponse {
   const { headers } = request;
   const host = headers.host ? headers.host[0].value : undefined;
 
@@ -63,7 +54,7 @@ function showGoogleSignInButton(request) {
     <script src="https://accounts.google.com/gsi/client" async></script>
   </head>
   <body>
-    <div id="g_id_onload" data-client_id="241235033991-terisug560a1st8rbcl8ujl46etkvtsc.apps.googleusercontent.com" data-context="signin" data-ux_mode="redirect" data-login_uri="https://${host}${CALLBACK_PATH}" data-auto_prompt="false"></div>
+    <div id="g_id_onload" data-client_id="${process.env.GOOGLE_CLIENT_ID}" data-context="signin" data-ux_mode="redirect" data-login_uri="https://${host}${CALLBACK_PATH}" data-auto_prompt="false"></div>
     <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_blue" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
   </body>
 </html>
@@ -76,11 +67,7 @@ function showGoogleSignInButton(request) {
   };
 }
 
-/**
- * @param {string} credential
- * @returns {Promise<boolean>}
- */
-async function verifyCredential(credential) {
+async function verifyCredential(credential: string): Promise<boolean> {
   const jwt = jsonwebtoken.decode(credential, { complete: true });
   if (jwt === null) {
     console.error("Could not decode JWT", { credential });
@@ -110,10 +97,7 @@ async function verifyCredential(credential) {
   }
 }
 
-/**
- * @type {import('aws-lambda').CloudFrontRequestHandler}
- */
-export const handler = async (event) => {
+export const handler: CloudFrontRequestHandler = async (event) => {
   const request = event.Records[0].cf.request;
   const headers = request.headers;
   switch (request.uri) {

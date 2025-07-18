@@ -1,9 +1,16 @@
 {
   "type": "module",
+  "scripts": {
+    "build": "esbuild index.ts --bundle \"--define:process.env.GOOGLE_CLIENT_ID='$GOOGLE_CLIENT_ID'\" --outfile=dist/index.js --minify --platform=node --target=node22"
+  },
   "dependencies": {
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "aws-lambda": "^1.0.7"
+    "@types/aws-lambda": "^8.10.150",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.14",
+    "esbuild": "^0.25.6",
+    "typescript": "^5.8.3"
   }
 }

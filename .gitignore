@@ -1,3 +1,5 @@
+builds/
+
 # https://github.com/terraform-google-modules/terraform-example-foundation/blob/main/.gitignore
 **/.terraform*
 *.tfstate

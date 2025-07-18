@@ -24,9 +24,18 @@ module "lambda_function" {
   lambda_at_edge = true
   publish        = true
 
-  handler     = "index.handler"
-  runtime     = "nodejs22.x"
-  source_path = "./lambda_function"
+  handler = "index.handler"
+  runtime = "nodejs22.x"
+  source_path = [
+    {
+      path = "./lambda_function",
+      commands : [
+        "npm install",
+        "GOOGLE_CLIENT_ID=${var.google_client_id} npm run build",
+        ":zip dist/index.js",
+      ]
+    }
+  ]
 }
 
 module "cloudfront" {
